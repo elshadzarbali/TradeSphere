@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: eureka-server # The name of this microservice
+
+server:
+  port: 8761 # Standard default port for Eureka Server
+
+eureka:
+  client:
+    # Since this is the registry itself, it should not register as a client
+    register-with-eureka: false
+    # Prevents this server from fetching the registry data from other Eureka nodes.
+    # Set to false because this is a standalone registry, not part of a High Availability (HA) cluster.
+    fetch-registry: false

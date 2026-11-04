@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- PARENT REFERENCE -->
+    <!-- Inherits version management and global configurations from the parent POM -->
+    <parent>
+        <groupId>com.tradesphere</groupId>
+        <artifactId>tradesphere-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <!-- Points to the parent POM located two directories up -->
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <!-- MODULE IDENTITY -->
+    <!-- 'groupId' and 'version' are intentionally omitted here as they are inherited from the parent -->
+    <artifactId>eureka-server</artifactId>
+    <name>eureka-server</name>
+    <description>Service Discovery (Eureka Server) for TradeSphere architecture</description>
+
+    <!-- DEPENDENCIES -->
+    <!--
+         Note: The <dependencyManagement> block is omitted here.
+         Spring Cloud versions are managed centrally in the parent POM.
+    -->
+
+    <dependencies>
+
+        <!--
+             Note on omitted dependencies:
+             - spring-boot-starter: Removed because netflix-eureka-server brings it transitively.
+             - spring-boot-starter-test: Removed because it is defined globally in the parent POM.
+        -->
+
+        <!-- Eureka Server dependency -->
+        <!-- No <version> tag is used; it inherits the exact version from the parent's dependencyManagement -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+        </dependency>
+
+    </dependencies>
+
+    <!-- BUILD SETTINGS -->
+    <build>
+        <plugins>
+            <!-- Packages the application into an executable, self-contained "Fat JAR" -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

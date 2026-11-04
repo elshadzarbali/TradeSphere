@@ -1,0 +1,10 @@
+# Auto detect text files and perform LF normalization
+* text=auto
+
+# Custom for Windows scripts
+*.cmd text eol=crlf
+*.bat text eol=crlf
+
+# Custom for Linux/Mac scripts
+*.sh text eol=lf
+mvnw text eol=lf
