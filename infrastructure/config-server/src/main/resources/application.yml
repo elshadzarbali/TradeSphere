@@ -1,0 +1,22 @@
+server:
+  # Standard default port for Spring Cloud Config Server
+  port: 8888
+
+spring:
+  application:
+    name: config-server
+  profiles:
+    # Uses the local file system to store configurations instead of a Git repository
+    active: native
+  cloud:
+    config:
+      server:
+        native:
+          # The directory where shared configuration files will be located
+          search-locations: classpath:/shared-configs/
+
+eureka:
+  client:
+    serviceUrl:
+      # Registers this config-server with our Eureka Service Registry
+      defaultZone: http://localhost:8761/eureka/
