@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- PARENT REFERENCE -->
+    <!-- Inherits version management and global configurations from the parent POM -->
+    <parent>
+        <groupId>com.tradesphere</groupId>
+        <artifactId>tradesphere-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <!-- Points to the parent POM located two directories up -->
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <!-- MODULE IDENTITY -->
+    <!-- 'groupId' and 'version' are intentionally omitted here as they are inherited from the parent -->
+    <artifactId>config-server</artifactId>
+    <name>config-server</name>
+    <description>Centralized Configuration Server for TradeSphere</description>
+
+    <!--
+         DELETED: <properties>
+         Removed because Java and Spring Cloud versions are already defined globally in the parent POM.
+    -->
+
+    <!-- DEPENDENCIES -->
+    <!--
+         Note: The <dependencyManagement> block is omitted here.
+         Spring Cloud versions are managed centrally in the parent POM.
+    -->
+
+    <dependencies>
+        <!--
+             Note on omitted dependencies:
+             - spring-boot-starter: Removed because config-server brings it automatically.
+             - spring-boot-starter-test: Removed because it is defined globally in the parent POM.
+        -->
+
+        <!-- Enables this module to act as the centralized Config Server. -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-config-server</artifactId>
+        </dependency>
+
+        <!-- Registers the Config Server with Eureka so other microservices can find it. -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+    </dependencies>
+
+    <!-- BUILD SETTINGS -->
+    <build>
+        <plugins>
+            <!-- Packages the application into an executable, self-contained "Fat JAR" -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

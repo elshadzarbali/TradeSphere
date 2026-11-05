@@ -1,0 +1,20 @@
+# ==============================================================
+# GLOBAL CONFIGURATION
+# Applied automatically to ALL microservices in TradeSphere
+# ==============================================================
+
+eureka:
+  client:
+    serviceUrl:
+      # All microservices will find Eureka using this URL.
+      # No need to copy-paste this into every single microservice anymore.
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    # Prefer IP address over hostname for stable microservice network routing
+    prefer-ip-address: true
+
+tradesphere:
+  global:
+    # A simple test property to verify if config-server is distributing data
+    environment: "development"
+    message: "Hello from Centralized Config Server!"
