@@ -62,6 +62,8 @@
     <!-- List of registered child modules (microservices) within this monorepo -->
     <modules>
         <module>infrastructure/eureka-server</module>
+        <module>infrastructure/config-server</module>
+        <module>infrastructure/api-gateway</module>
     </modules>
 
 </project>

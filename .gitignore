@@ -64,3 +64,8 @@ out/
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# ==========================================
+# 7. AI & PACKING TOOLS
+# ==========================================
+repomix-output.*
