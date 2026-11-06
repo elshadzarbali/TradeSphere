@@ -31,7 +31,7 @@ Below is the complete multi-profile configuration to simulate two peers (`peer1`
 ```yaml
 spring:
   application:
-    name: eureka-server
+    name: discovery-server
 
 ---
 # ==========================================
@@ -81,11 +81,11 @@ eureka:
 To start both nodes simultaneously in IntelliJ IDEA:
 
 1. Open **Run/Debug Configurations** (Edit Configurations...).
-2. Duplicate your existing `EurekaServerApplication` configuration.
-3. Name the first one: `EurekaServer-Peer1`.
+2. Duplicate your existing `DiscoveryServerApplication` configuration.
+3. Name the first one: `DiscoveryServer-Peer1`.
    - Go to **Active Profiles** (or VM options) and set the profile to `peer1`.
    - *(If using VM options: `-Dspring.profiles.active=peer1`)*
-4. Name the second one: `EurekaServer-Peer2`.
+4. Name the second one: `DiscoveryServer-Peer2`.
    - Set the profile to `peer2`.
 5. Run both configurations.
 
