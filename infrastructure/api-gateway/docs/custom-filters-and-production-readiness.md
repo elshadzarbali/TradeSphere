@@ -146,7 +146,7 @@ spring:
 ## 4. Why Do Microservices Use `ApiGatewayApplication` Without Extra Annotations?
 
 You might notice that our main classes look different across modules:
-* **`EurekaServerApplication`:** Has `@SpringBootApplication` + **`@EnableEurekaServer`** (Mandatory to turn on the Registry server).
+* **`DiscoveryServerApplication`:** Has `@SpringBootApplication` + **`@EnableEurekaServer`** (Mandatory to turn on the Registry server).
 * **`ConfigServerApplication`:** Has `@SpringBootApplication` + **`@EnableConfigServer`** (Mandatory to turn on the Config server).
 * **`ApiGatewayApplication`:** Only has **`@SpringBootApplication`**!
   * **Why no `@EnableEurekaClient`?** Removed in Spring Cloud 2022+.

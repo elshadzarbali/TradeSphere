@@ -1,10 +1,10 @@
-package com.tradesphere.eurekaserver;
+package com.tradesphere.discoveryserver;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class EurekaServerApplicationTests {
+class DiscoveryServerApplicationTests {
 
     @Test
     void contextLoads() {

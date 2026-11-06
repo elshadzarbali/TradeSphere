@@ -15,8 +15,8 @@
 
     <!-- MODULE IDENTITY -->
     <!-- 'groupId' and 'version' are intentionally omitted here as they are inherited from the parent -->
-    <artifactId>eureka-server</artifactId>
-    <name>eureka-server</name>
+    <artifactId>discovery-server</artifactId>
+    <name>discovery-server</name>
     <description>Service Discovery (Eureka Server) for TradeSphere architecture</description>
 
     <!-- DEPENDENCIES -->
