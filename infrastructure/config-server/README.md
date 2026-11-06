@@ -1,36 +1,31 @@
-# 🚪 TradeSphere - API Gateway
+# 🛠️ TradeSphere - Config Server
 
-This module is the **Single Entry Point (Edge Server / Reverse Proxy)** for the TradeSphere microservices ecosystem. It runs on **Spring Cloud Gateway (Reactive WebFlux / Netty)** on port `8080`.
+This module is the **Centralized Configuration Server** for the TradeSphere microservices architecture. It acts as the single source of truth for all environment variables, database credentials, and routing configurations across the entire ecosystem.
 
-All external client requests (Frontend/Mobile) enter through port `8080`. The Gateway logs the request, looks up the target microservice's dynamic IP address from Eureka (cached in Caffeine Cache), balances the load across instances, and forwards the traffic non-blockingly.
+## 📚 Technical Documentation
 
-## 📚 Detailed Engineering Guides (`docs/`)
+To fully understand the architecture, configuration flow, and environment setups, please refer to the detailed engineering guides located in the `docs/` directory:
 
-We have documented every architectural decision, configuration property, and real-world troubleshooting scenario in clear, easy-to-read English inside the `docs/` folder:
+1. **[Architecture & Flow Overview](docs/config-server-architecture.md)**  
+   *Visual Mermaid diagrams explaining how the Config Server interacts with Eureka and other microservices during startup.*
+2. **[Environment Strategies (Dev vs. Prod)](docs/config-server-environments.md)**  
+   *A guide on how the server operates locally (`native` profile) versus how it secures and scales in a Production environment.*
+3. **[Global Configuration Guide](docs/shared-application-yml-guide.md)**  
+   *A deep dive into the `shared-configs/application.yml` file, explaining property inheritance and the Database-per-Service pattern.*
 
-1. **[Architecture, Reactive Netty Engine & Caffeine Cache](docs/gateway-architecture-and-reactive-engine.md)**  
-   *Explains why we need a Gateway, Blocking Tomcat vs. Non-Blocking Netty (Restaurant Waiter analogy), Spring Cloud 2025+ WebFlux vs. MVC split, Client-Side Load Balancing with Caffeine Cache (`ConcurrentHashMap` lock contention), and how `prefer-ip-address: true` fixes the Windows Netty DNS `NXDOMAIN` error.*
-2. **[Routing Rules, Predicates & Filters Guide](docs/routing-predicates-and-filters-guide.md)**  
-   *Covers the exact 3-step startup sequence, why `fail-fast: true` replaces `optional:configserver:`, why `discovery.locator.enabled: true` creates duplicate routes in development (and why it must be `false` in production), and when to use `StripPrefix=1` vs. direct path forwarding vs. `RewritePath`.*
-3. **[Custom Java Filters (`GlobalFilter`), Timeouts & Retry Logic](docs/custom-filters-and-production-readiness.md)**  
-   *Explains `GlobalFilter` vs. `GatewayFilter`, how `RequestLoggingGlobalFilter` measures latency, why `exchange.getAttributes()` must be used instead of `ThreadLocal` in Netty, global timeouts, how Retry skips dead cached IPs, and why Main class annotations like `@EnableDiscoveryClient` are no longer required.*
+## 🚀 Quick Start (Development Mode)
 
-## 🚀 How to Run (Strict Startup Order)
+1. Ensure the **Eureka Server** (`discovery-server` module) is running on port `8761`.
+2. Start the Config Server by running `ConfigServerApplication.java`.
+3. The server will boot up on port `8888` and auto-register with Eureka.
+4. Verify it's serving files by visiting the following URL in your browser:
+   ```text
+   http://localhost:8888/application/default
+   ```
 
-Because `fail-fast: true` is active, always start the modules in this exact order:
+## ⚙️ Core Technologies
 
-1. **Discovery Server (`infrastructure/eureka-server`)** — Port `8761`
-2. **Config Server (`infrastructure/config-server`)** — Port `8888`
-3. **API Gateway (`infrastructure/api-gateway`)** — Port `8080`
-
-### Verification URLs
-* **Inspect Active Routes in Memory:** `http://localhost:8080/actuator/gateway/routes`
-* **Gateway Health Status:** `http://localhost:8080/actuator/health`
-* **Test Routing & `StripPrefix=1` via Config Server:** `http://localhost:8080/config/application/default`
-
-## ⚙️ Tech Stack
-* **Java 21 & Spring Boot 3.5.x**
-* **Spring Cloud Gateway Server WebFlux (`2025.0.x`)**
-* **Project Reactor & Netty (Non-Blocking Event Loop)**
-* **Netflix Eureka Client & Spring Cloud LoadBalancer**
-* **Caffeine Cache (W-TinyLFU In-Memory Caching)**
+* **Java 21**
+* **Spring Boot 3.x**
+* **Spring Cloud Config**
+* **Netflix Eureka Client**
