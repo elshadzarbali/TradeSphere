@@ -20,3 +20,7 @@ eureka:
     serviceUrl:
       # Registers this config-server with our Eureka Service Registry
       defaultZone: http://localhost:8761/eureka/
+  instance:
+    # CRITICAL FIX: Forces Config Server to register its raw IP address instead of
+    # Windows/Docker hostnames (e.g., DESKTOP-xxx.mshome.net) that fail Netty DNS resolution.
+    prefer-ip-address: true

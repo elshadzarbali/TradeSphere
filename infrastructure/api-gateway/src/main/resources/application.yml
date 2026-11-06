@@ -1,0 +1,14 @@
+spring:
+  application:
+    # Must match the exact filename 'api-gateway.yml' inside config-server's shared-configs/
+    name: api-gateway
+  config:
+    # Fetch configurations from the centralized Config Server running on port 8888.
+    # Strict import (no 'optional:' prefix). Gateway cannot operate without its routing rules!
+    import: "configserver:http://localhost:8888"
+  cloud:
+    config:
+      # Fail immediately on startup if the Config Server is unreachable
+      fail-fast: true
+
+# RETRY?

@@ -1,0 +1,74 @@
+# ===================================================================
+# API GATEWAY CENTRALIZED CONFIGURATION & ROUTING RULES
+# (Spring Boot 3.5+ & Spring Cloud 2025.0+ WebFlux Schema)
+# ===================================================================
+
+server:
+  # Single entry point port for all external client (Frontend/Mobile) traffic
+  # The standard port for an API Gateway is 8080
+  port: 8080
+
+spring:
+  cloud:
+    gateway:
+      server:
+        webflux:
+          # 1. AUTOMATIC DISCOVERY LOCATOR
+          discovery:
+            locator:
+              # Set to 'true' for rapid local development (auto-creates /service-name/** routes).
+              # IMPORTANT: In Production, set this to 'false' to prevent exposing internal services!
+              enabled: true
+              lower-case-service-id: true
+
+          # 2. GLOBAL HTTP CLIENT TIMEOUTS (Netty)
+          # Prevents slow downstream microservices from hanging connections indefinitely
+          httpclient:
+            connect-timeout: 3000 # Max time to establish a TCP connection (3 seconds in ms)
+            response-timeout: 5s  # Max time to wait for a HTTP response after connecting
+
+          # 3. EXPLICIT ROUTING RULES
+          routes:
+            # --- Route 1: Config Server (For local testing/debugging only) ---
+            - id: config-server-route
+              # 'lb://' stands for Load Balancer. The Gateway will look up 'CONFIG-SERVER' in Eureka to resolve its dynamic IP.
+              uri: lb://CONFIG-SERVER
+              predicates:
+                # Matches any request starting with /config/ (e.g., http://localhost:8080/config/...)
+                - Path=/config/**
+              filters:
+                # Removes the '/config' prefix before forwarding the request to the downstream service.
+                - StripPrefix=1
+
+            # --- Route 2: Wallet Service (Phase 2) ---
+            # Example: Client calls http://localhost:8080/api/v1/wallets/balance
+            # Gateway forwards directly to WALLET-SERVICE -> /api/v1/wallets/balance (no StripPrefix needed if paths match!)
+            - id: wallet-service-route
+              uri: lb://WALLET-SERVICE
+              predicates:
+                - Path=/api/v1/wallets/**
+
+            # --- Route 3: Trading Service (Phase 2) ---
+            # Example: Client calls http://localhost:8080/api/v1/trades/buy
+            - id: trading-service-route
+              uri: lb://TRADING-SERVICE
+              predicates:
+                - Path=/api/v1/trades/**
+
+# ===================================================================
+# ACTUATOR & MONITORING ENDPOINTS (Spring Boot 3.4+ Syntax)
+# ===================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        # Exposes /actuator/health, /actuator/info, and /actuator/gateway/routes
+        include: health, info, gateway
+  endpoint:
+    gateway:
+      access: unrestricted # Replaces deprecated 'enabled: true' in Spring Boot 3.4+ which enables the live route inspection endpoint
+    health:
+      show-details: always
+
+# Note: Eureka client configuration (eureka.client.serviceUrl) is inherited
+# from the global application.yml in this folder!

@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- PARENT REFERENCE -->
+    <!-- Inherit centralized configuration, Java version, and Spring Cloud BOM from the TradeSphere parent POM -->
+    <parent>
+        <groupId>com.tradesphere</groupId>
+        <artifactId>tradesphere-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <!-- Points to the parent POM located two directories up -->
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <!-- MODULE IDENTITY -->
+    <!-- 'groupId' and 'version' are intentionally omitted here as they are inherited from the parent -->
+    <artifactId>api-gateway</artifactId>
+    <name>api-gateway</name>
+    <description>API Gateway module for TradeSphere microservices ecosystem. Acts as the single entry point, handling routing and load balancing.</description>
+
+    <!--
+         DELETED: <properties>
+         Removed because Java and Spring Cloud versions are already defined globally in the parent POM.
+    -->
+
+    <!-- DEPENDENCIES MANAGEMENTS -->
+    <!--
+         Note: The <dependencyManagement> block is omitted here.
+         Spring Cloud versions are managed centrally in the parent POM.
+    -->
+
+    <dependencies>
+        <!--
+             Note on omitted dependencies:
+             - spring-boot-starter: Removed because config-server brings it automatically.
+             - spring-boot-starter-test: Removed because it is defined globally in the parent POM.
+        -->
+
+        <!-- CORE ROUTING ENGINE (Spring Cloud 2025+ Standard) -->
+        <!-- Spring Cloud Gateway (Reactive/WebFlux based on Netty).
+             Explicitly selects the Reactive (WebFlux/Netty) Gateway Server engine.
+             Replaces the deprecated 'spring-cloud-starter-gateway' artifact. -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway-server-webflux</artifactId>
+        </dependency>
+
+        <!-- SERVICE DISCOVERY -->
+        <!-- Netflix Eureka Client:
+             Allows the Gateway to register with Eureka and resolve 'lb://SERVICE-NAME' into dynamic IP:Port pairs. -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <!-- HIGH-PERFORMANCE LOADBALANCER CACHE -->
+        <!-- Recommended by Spring Cloud LoadBalancer for caching Eureka service instances in production. -->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
+
+        <!-- CENTRALIZED CONFIGURATION -->
+        <!-- Config Client:
+             Instructs the API Gateway to fetch its application.yml properties from the Config Server (port 8888)
+             (which we already set up) upon startup. -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+
+        <!-- MONITORING & ROUTE INSPECTION -->
+        <!-- Exposes /actuator/health and /actuator/gateway/routes for debugging and container healthchecks. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+    </dependencies>
+
+
+    <!-- BUILD SETTINGS -->
+    <build>
+        <plugins>
+            <!-- Packages the application into an executable, self-contained "Fat JAR" -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
