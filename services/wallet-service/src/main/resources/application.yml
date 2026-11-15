@@ -1,0 +1,35 @@
+# ==============================================================================
+# LOCAL BOOTSTRAP CONFIGURATION (Wallet Service)
+# ==============================================================================
+
+spring:
+  application:
+    # CRITICAL: Tells Config Server to fetch 'wallet-service.yml' (plus global 'application.yml')
+    # and registers this app as 'WALLET-SERVICE' in Discovery Server.
+    name: wallet-service
+  config:
+    # Connects to Config Server at startup.
+    # 'optional:' is omitted intentionally because of fail-fast architecture.
+    import: "configserver:http://localhost:8888"
+  cloud:
+    config:
+      # Fail-Fast Architecture: If Config Server is unreachable after all retries,
+      # crash the application immediately at startup instead of running without DB configs.
+      fail-fast: true
+
+      # NOTE: Need spring-retry and spring-boot-starter-aop dependecies in pom.xml to work this feature
+      # Exponential Backoff Retry Mechanism (Useful when starting all services via Docker Compose)
+      retry:
+        # Wait 1000ms (1 second) before the 1st retry if the initial connection fails.
+        initial-interval: 1000
+
+        # Try connecting up to 6 times in total before giving up and throwing an exception.
+        max-attempts: 6
+
+        # Multiplication factor for each subsequent wait time (Exponential Backoff).
+        # Example: 1st wait = 1000ms, 2nd wait = 1100ms (1000 * 1.1), 3rd wait = 1210ms, etc.
+        multiplier: 1.1
+
+        # Upper limit (cap) for the wait time. Even if the multiplier calculates 2500ms,
+        # the wait time between retries will never exceed 2000ms (2 seconds).
+        max-interval: 2000

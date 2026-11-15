@@ -1,0 +1,58 @@
+# ==============================================================================
+# WALLET SERVICE SPECIFIC CONFIGURATION
+# Inherits global properties (like Eureka URL) from 'application.yml'
+# ==============================================================================
+
+server:
+  # Fixed port for local development; can be set to 0 for dynamic port allocation in clustering
+  port: 8081
+
+spring:
+  datasource:
+    # Connects to the local/Docker PostgreSQL instance
+    url: jdbc:postgresql://localhost:5432/tradesphere_wallet
+    username: tradesphere_user
+    password: password123
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    # Disables Open Session in View (OSIV) to prevent holding DB connections open during HTTP serialization
+    # and to avoid accidental N+1 lazy queries in the Controller layer.
+    open-in-view: false
+    hibernate:
+      # 'update' automatically creates/updates tables based on Entities during development.
+      # In production, switch to 'validate' and use Liquibase for schema migrations.
+      ddl-auto: validate
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true # Formats the logged SQL queries nicely across multiple lines for easier debugging
+#        dialect: org.hibernate.dialect.PostgreSQLDialect # PostgreSQLDialect does not need to be specified explicitly
+
+eureka:
+  # NOTE: 'defaultZone' and 'prefer-ip-address' are omitted here because they are
+  # automatically inherited from the global 'application.yml' in Config Server!
+  instance:
+    # Assigns a unique ID in Discovery Server (e.g., wallet-service:a8f9d0).
+    # Why: If we run 3 instances of wallet-service on the same port/host via Docker,
+    # Eureka won't overwrite them and will treat each as a distinct instance for Load Balancing.
+    instance-id: ${spring.application.name}:${random.value}
+
+# ==============================================================================
+# ACTUATOR & MONITORING (Production Readiness)
+# ==============================================================================
+management:
+  endpoints:
+    web:
+      exposure:
+        # By default, Spring Boot 3 hides almost all endpoints over HTTP for security.
+        # Here we explicitly expose:
+        # - /actuator/health : Checks if the service and its PostgreSQL DB are UP.
+        # - /actuator/info   : Displays general application metadata.
+        # - /actuator/metrics: Provides JVM memory, CPU, Tomcat thread pool, and HikariCP stats.
+        include: health,info,metrics
+  endpoint:
+    health:
+      # By default, /actuator/health only returns {"status": "UP"} and hides inner details.
+      # 'always' forces it to show sub-components: PostgreSQL connection status, Disk Space,
+      # and Eureka status. If DB goes down, you immediately see why the service failed.
+      show-details: always

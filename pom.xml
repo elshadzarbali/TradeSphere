@@ -30,17 +30,27 @@
         <maven.compiler.source>${java.version}</maven.compiler.source>
         <maven.compiler.target>${java.version}</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <org.mapstruct.version>1.6.3</org.mapstruct.version>
+        <lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
     </properties>
 
-    <!-- Centralized dependency management. Locks library versions without actually importing them -->
+    <!-- Centralized dependency management. Locks library versions without actually importing them into every module -->
     <dependencyManagement>
         <dependencies>
+            <!-- Spring Cloud BOM (Bill of Materials) -->
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
+            </dependency>
+
+            <!-- MapStruct version locked centrally. Only modules that explicitly declare it will download it -->
+            <dependency>
+                <groupId>org.mapstruct</groupId>
+                <artifactId>mapstruct</artifactId>
+                <version>${org.mapstruct.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -64,6 +74,44 @@
         <module>infrastructure/discovery-server</module>
         <module>infrastructure/config-server</module>
         <module>infrastructure/api-gateway</module>
+        <module>services/wallet-service</module>
     </modules>
+
+    <!-- Global Build Configuration inherited by all child modules -->
+    <build>
+        <plugins>
+            <!-- Configured once here so child modules DO NOT need to repeat annotation processor paths -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <!-- Mandatory for Spring Boot 3.2+: Retains parameter names in bytecode to avoid explicit @PathVariable("name") -->
+                    <parameters>true</parameters>
+                    <annotationProcessorPaths>
+                        <!-- 1. Lombok runs first to generate Getters, Setters, and Builders -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+
+                        <!-- 2. Bridge: Ensures MapStruct waits until Lombok finishes generating bytecode -->
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok-mapstruct-binding.version}</version>
+                        </path>
+
+                        <!-- 3. MapStruct runs last, utilizing Lombok-generated methods to build Mapper implementations -->
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${org.mapstruct.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
