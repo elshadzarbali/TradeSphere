@@ -1,0 +1,38 @@
+# ==============================================================================
+# TRADESPHERE INFRASTRUCTURE & DATABASES (Local Development)
+# ==============================================================================
+services:
+  postgres-wallet:
+    # Lightweight Alpine image with PostgreSQL 18
+    image: postgres:18-alpine
+    container_name: tradesphere-postgres-wallet
+    # Auto-restart on crash or system reboot unless manually stopped
+    restart: unless-stopped
+    environment:
+      # Credentials matching 'wallet-service.yml' in Config Server
+      POSTGRES_DB: tradesphere_wallet
+      POSTGRES_USER: tradesphere_user
+      POSTGRES_PASSWORD: password123
+    ports:
+      # Maps host port 5432 to container port 5432
+      - "5432:5432"
+    volumes:
+      # Persists database data on your host machine even if the container is removed
+      # Remove /data at the end of volume for PostgreSQL 18+
+      - postgres_wallet_data:/var/lib/postgresql
+    networks:
+      - tradesphere-net
+    healthcheck:
+      # Ensures PostgreSQL is actually ready to accept connections, not just "container started"
+      test: ["CMD-SHELL", "pg_isready -U tradesphere_user -d tradesphere_wallet"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_wallet_data:
+    driver: local # Store volume data on the local host machine
+
+networks:
+  tradesphere-net:
+    driver: bridge # Isolated bridge network for container-to-container communication

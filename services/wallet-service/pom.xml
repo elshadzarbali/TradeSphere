@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- PARENT POM REFERENCE -->
+    <!-- Inherits Java 21, Spring Cloud BOM, global dependencies (Lombok, Test),
+         and the maven-compiler-plugin (Lombok + MapStruct processor paths) from the parent POM -->
+    <parent>
+        <groupId>com.tradesphere</groupId>
+        <artifactId>tradesphere-parent</artifactId>
+        <version>1.0-SNAPSHOT</version>
+        <!-- Points to the parent POM located two directories up -->
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
+    <!-- MODULE IDENTITY -->
+    <!-- 'groupId' and 'version' are intentionally omitted here as they are inherited from the parent -->
+    <artifactId>wallet-service</artifactId>
+    <name>wallet-service</name>
+    <description>Core business service managing user balances and ledger transactions</description>
+
+    <!--
+         DELETED: <properties>
+         Removed because Java and Spring Cloud versions are already defined globally in the parent POM.
+    -->
+
+    <!-- DEPENDENCIES MANAGEMENTS -->
+    <!--
+         Note: The <dependencyManagement> block is omitted here.
+         Spring Cloud versions are managed centrally in the parent POM.
+    -->
+
+    <dependencies>
+        <!-- WEB MVC (Tomcat Engine) -->
+        <!-- Unlike API Gateway (which uses Netty/WebFlux), business microservices interacting with
+             relational databases (JDBC) use standard blocking synchronous Servlets via Tomcat. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+
+        <!-- DATABASE, ORM & MIGRATION -->
+        <!-- For object-relational mapping and repository abstractions using Hibernate. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!-- The actual driver to connect to the PostgreSQL database.
+             Scope is 'runtime' because we don't need database-specific classes at compile time. -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- Migration -->
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+        </dependency>
+
+        <!-- SERVICE DISCOVERY & LOAD BALANCING -->
+        <!-- Registers wallet-service with discovery-server so API Gateway can route traffic to it. -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <!-- Required for client-side load balancing.
+             If wallet-service needs to call trading-service via Feign or RestTemplate,
+             this dependency resolves the service name (TRADING-SERVICE) into an actual IP/Port. -->
+<!--        Bunu sonra acariq-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.cloud</groupId>-->
+<!--            <artifactId>spring-cloud-starter-loadbalancer</artifactId>-->
+<!--        </dependency>-->
+
+        <!-- CENTRALIZED CONFIGURATION -->
+        <!-- Allows wallet-service to fetch its configurations (like DB credentials) from config-server. -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+
+        <!-- MONITORING & HEALTH -->
+        <!-- Exposes /actuator/health and /actuator/info endpoints.
+             Crucial for discovery-server and Kubernetes/Docker to know if the service is alive. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- DTO MAPPING -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+        </dependency>
+
+        <!-- VALIDATION -->
+        <!-- Essential for validating incoming REST payloads (DTOs) using @NotNull, @Min, @NotBlank, etc. -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+        </dependency>
+
+        <!-- OpenAPI 3.0 / Swagger UI Documentation -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>2.10.0</version>
+        </dependency>
+
+        <!--
+        ========================================================================
+        INHERITED FROM PARENT POM (Do not redeclare here):
+        ========================================================================
+        1. Lombok (org.projectlombok:lombok)
+        2. Test Dependencies (spring-boot-starter-test)
+        3. Maven Compiler Plugin (Lombok & MapStruct annotationProcessorPaths)
+        ========================================================================
+        -->
+    </dependencies>
+
+    <!-- BUILD SETTINGS -->
+    <!-- Note: maven-compiler-plugin is omitted here because it is inherited from tradesphere-parent.
+         Only spring-boot-maven-plugin is declared to package this specific microservice into an executable Fat JAR. -->
+    <build>
+        <plugins>
+            <!-- Packages the application into an executable, self-contained "Fat JAR" -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>
